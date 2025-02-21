@@ -1,0 +1,128 @@
+services:
+  # Cloudflare Tunnel
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TOKEN}
+    restart: unless-stopped
+    environment:
+      - CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
+
+  # Portainer
+  portainer:
+    image: portainer/portainer-ce:latest
+    ports:
+      - 9443:9443
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    network_mode: host
+    ports:
+      - 32400:32400/tcp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - VERSION=docker
+      - PLEX_CLAIM= #optional
+    volumes:
+      - ./media/library:/config
+      - ./media/series:/tv
+      - ./media/movies:/movies
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 11434:11434
+    volumes:
+      - ./data/ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+    network_mode: host
+
+  # Outline Wiki
+  # outline:
+  #   image: docker.getoutline.com/outlinewiki/outline:latest
+  #   env_file: ./docker.env
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - storage-data:/var/lib/outline/data
+  #   depends_on:
+  #     - outline_postgres
+  #     - outline_redis
+  #   restart: unless-stopped
+
+  # outline_redis:
+  #   image: redis
+  #   env_file: ./docker.env
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - ./redis.conf:/redis.conf
+  #   command: ["redis-server", "/redis.conf"]
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 30s
+  #     retries: 3
+  #   restart: unless-stopped
+
+  # outline_postgres:
+  #   image: postgres
+  #   env_file: ./docker.env
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - database-data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD", "pg_isready", "-d", "outline", "-U", "user"]
+  #     interval: 30s
+  #     timeout: 20s
+  #     retries: 3
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: 'user'
+  #     POSTGRES_PASSWORD: 'pass'
+  #     POSTGRES_DB: 'outline'
+
+  # https-portal:
+  #   image: steveltn/https-portal
+  #   env_file: ./docker.env
+  #   ports:
+  #     - '80:80'
+  #     - '443:443'
+  #   links:
+  #     - outline
+  #   volumes:
+  #     - https-portal-data:/var/lib/https-portal
+  #   healthcheck:
+  #     test: ["CMD", "service", "nginx", "status"]
+  #     interval: 30s
+  #     timeout: 20s
+  #     retries: 3
+  #   restart: unless-stopped
+  #   environment:
+  #     DOMAINS: 'docs.mycompany.com -> http://outline:3000'
+  #     STAGE: 'production'
+  #     WEBSOCKET: 'true'
+  #     CLIENT_MAX_BODY_SIZE: '0'
+  # Outline Wiki
+
+volumes:
+  portainer-data:
+  # https-portal-data:
+  # storage-data:
+  # database-data:
+
+
