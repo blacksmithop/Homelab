@@ -1,0 +1,328 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: homelab
+---
+# Cloudflare Tunnel
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+  namespace: homelab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:latest
+          args:
+            - tunnel
+            - --no-autoupdate
+            - run
+            - --token
+            - $(CLOUDFLARE_TOKEN)
+          env:
+            - name: CLOUDFLARE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflared-secrets
+                  key: token
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudflared
+  namespace: homelab
+spec:
+  selector:
+    app: cloudflared
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+# Nginx Proxy Manager (NPM)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-proxy-manager
+  namespace: homelab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-proxy-manager
+  template:
+    metadata:
+      labels:
+        app: nginx-proxy-manager
+    spec:
+      containers:
+        - name: nginx-proxy-manager
+          image: jc21/nginx-proxy-manager:latest
+          ports:
+            - containerPort: 80
+            - containerPort: 81
+            - containerPort: 443
+          env:
+            - name: DB_SQLITE_FILE
+              value: "/data/database.sqlite"
+          volumeMounts:
+            - name: npm-data
+              mountPath: /data
+            - name: letsencrypt-data
+              mountPath: /etc/letsencrypt
+      volumes:
+        - name: npm-data
+          persistentVolumeClaim:
+            claimName: npm-data-pvc
+        - name: letsencrypt-data
+          persistentVolumeClaim:
+            claimName: letsencrypt-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-proxy-manager
+  namespace: homelab
+spec:
+  selector:
+    app: nginx-proxy-manager
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: admin
+      protocol: TCP
+      port: 81
+      targetPort: 81
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 443
+  type: LoadBalancer
+---
+# Portainer
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portainer
+  namespace: homelab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portainer
+  template:
+    metadata:
+      labels:
+        app: portainer
+    spec:
+      containers:
+        - name: portainer
+          image: portainer/portainer-ce:latest
+          ports:
+            - containerPort: 9443
+          volumeMounts:
+            - name: portainer-data
+              mountPath: /data
+            - name: docker-sock
+              mountPath: /var/run/docker.sock
+      volumes:
+        - name: portainer-data
+          persistentVolumeClaim:
+            claimName: portainer-data-pvc
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: portainer
+  namespace: homelab
+spec:
+  selector:
+    app: portainer
+  ports:
+    - protocol: TCP
+      port: 9443
+      targetPort: 9443
+  type: LoadBalancer
+---
+# Plex
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex
+  namespace: homelab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plex
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      containers:
+        - name: plex
+          image: lscr.io/linuxserver/plex:latest
+          ports:
+            - containerPort: 32400
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Etc/UTC"
+            - name: VERSION
+              value: "docker"
+          volumeMounts:
+            - name: plex-library
+              mountPath: /config
+            - name: media-series
+              mountPath: /tv
+            - name: media-movies
+              mountPath: /movies
+      volumes:
+        - name: plex-library
+          persistentVolumeClaim:
+            claimName: plex-library-pvc
+        - name: media-series
+          hostPath:
+            path: /path/to/homelab/data/media/series
+        - name: media-movies
+          hostPath:
+            path: /path/to/homelab/data/media/movies
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex
+  namespace: homelab
+spec:
+  selector:
+    app: plex
+  ports:
+    - protocol: TCP
+      port: 32400
+      targetPort: 32400
+  type: LoadBalancer
+---
+# Ollama
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: homelab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          env:
+            - name: OLLAMA_KEEP_ALIVE
+              value: "24h"
+            - name: OLLAMA_HOST
+              value: "0.0.0.0"
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+      volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: ollama-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+  namespace: homelab
+spec:
+  selector:
+    app: ollama
+  ports:
+    - protocol: TCP
+      port: 11434
+      targetPort: 11434
+  type: LoadBalancer
+---
+# Persistent Volume Claims (PVCs)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: npm-data-pvc
+  namespace: homelab
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: letsencrypt-data-pvc
+  namespace: homelab
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: portainer-data-pvc
+  namespace: homelab
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plex-library-pvc
+  namespace: homelab
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-data-pvc
+  namespace: homelab
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
