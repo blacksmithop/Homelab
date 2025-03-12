@@ -22,12 +22,15 @@ services:
       - ./homelab/data/letsencrypt:/etc/letsencrypt
     environment:
       DB_SQLITE_FILE: "/data/database.sqlite"
-      # DISABLE_IPV6: "true"
-    # Ports are commented out as NPM will be accessed via Cloudflare Tunnel
-    ports:
-    #   - "80:80"
-      - "81:81"
-    #   - "443:443"
+
+
+  # Homepage
+  homepage:
+    image: blacksmithop/homepage
+    container_name: homepage
+    restart: unless-stopped
+    networks:
+      - services
 
   # Portainer
   portainer:
@@ -46,8 +49,6 @@ services:
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
-    # ports:
-    #   - 32400:32400/tcp
     environment:
       - PUID=1000
       - PGID=1000
