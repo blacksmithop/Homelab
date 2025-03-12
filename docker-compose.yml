@@ -9,7 +9,6 @@ services:
       - CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
     networks:
       - cf
-
   # Nginx Proxy Manager (NPM)
   npm:
     image: jc21/nginx-proxy-manager:latest
@@ -47,8 +46,8 @@ services:
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
-    ports:
-      - 32400:32400/tcp
+    # ports:
+    #   - 32400:32400/tcp
     environment:
       - PUID=1000
       - PGID=1000
