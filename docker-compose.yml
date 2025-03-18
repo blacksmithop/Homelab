@@ -18,8 +18,8 @@ services:
       - cf
       - services
     volumes:
-      - ./homelab/data/npm:/data
-      - ./homelab/data/letsencrypt:/etc/letsencrypt
+      - ./data/npm:/data
+      - ./data/letsencrypt:/etc/letsencrypt
     environment:
       DB_SQLITE_FILE: "/data/database.sqlite"
 
@@ -45,6 +45,29 @@ services:
     networks:
       - services
 
+  # ShellHub Agent
+  shellhub:
+    image: shellhubio/agent:v0.18.2
+    container_name: shellhub
+    restart: on-failure
+    privileged: true
+    network_mode: host
+    pid: host
+    volumes:
+      - /:/host
+      - /dev:/dev
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/passwd:/etc/passwd
+      - /etc/group:/etc/group
+      - /etc/resolv.conf:/etc/resolv.conf
+      - /var/run:/var/run
+      - /var/log:/var/log
+      - /tmp:/tmp
+    environment:
+      - SHELLHUB_SERVER_ADDRESS=${SHELLHUB_SERVER_ADDRESS}
+      - SHELLHUB_TENANT_ID=${SHELLHUB_TENANT_ID}
+      - SHELLHUB_PRIVATE_KEY=${SHELLHUB_PRIVATE_KEY:-/host/etc/shellhub.key}
+
   # Plex
   plex:
     image: lscr.io/linuxserver/plex:latest
@@ -56,8 +79,8 @@ services:
       - VERSION=docker
     volumes:
       - plex-library:/config
-      - ./homelab/data/media/series:/tv
-      - ./homelab/data/media/movies:/movies
+      - ./data/media/series:/tv
+      - ./data/media/movies:/movies
     restart: unless-stopped
     networks:
       - services
