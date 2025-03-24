@@ -57,6 +57,18 @@ services:
     environment:
       DB_SQLITE_FILE: "/data/database.sqlite"
 
+  # Portainer
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - 9443:9443
+    networks:
+      - warp
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
 
   # Homepage
   homepage:
@@ -91,17 +103,6 @@ services:
       OIDC_SCOPES: ""
     networks:
       - services
-
-  # Portainer
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    ports:
-      - 9443:9443
-    volumes:
-      - portainer-data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
 
   # ShellHub Agent
   shellhub:
