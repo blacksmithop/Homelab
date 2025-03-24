@@ -9,6 +9,40 @@ services:
       - CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
     networks:
       - cf
+      - warp
+  
+  # Cloudflare Warp
+  warp:
+    image: caomingjun/warp
+    container_name: warp
+    restart: always
+    # add removed rule back (https://github.com/opencontainers/runc/pull/3468)
+    device_cgroup_rules:
+      - 'c 10:200 rwm'
+    ports:
+      - "1080:1080"
+    networks:
+      - warp
+    environment:
+      - WARP_SLEEP=2
+      - WARP_LICENSE_KEY=${WARP_LICENSE_KEY}
+
+    cap_add:
+      # Docker already have them, these are for podman users
+      - MKNOD
+      - AUDIT_WRITE
+      # additional required cap for warp, both for podman and docker
+      - NET_ADMIN
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+      # uncomment for nat
+      # - net.ipv4.ip_forward=1
+      # - net.ipv6.conf.all.forwarding=1
+      # - net.ipv6.conf.all.accept_ra=2
+    volumes:
+      - ./data:/var/lib/cloudflare-warp
+
   # Nginx Proxy Manager (NPM)
   npm:
     image: jc21/nginx-proxy-manager:latest
@@ -132,5 +166,7 @@ volumes:
 networks:
   cf:
     name: cf
+  warp:
+    name: warp
   services:
     name: services
