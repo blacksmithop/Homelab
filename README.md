@@ -1,9 +1,15 @@
 # Homelab
 
-Following are the configuration for my mini-pc.
+---
 
-[.config](./config) will contain my dotfiles.
+## [Docker Setup](./homelab)
+Setup for the services on my homelab  
 
-[homelab](./homelab) folder will contain the [docker-compose](./homelab/docker-compose.yml) for the services I run.
+## [dotfiles](./config)
+My zsh config, aliases etc
 
 ---
+
+## Cloudflared Tunnel + Nginx Proxy Manager Setup
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Udc6HeOqxCY/0.jpg)](https://www.youtube.com/watch?v=Udc6HeOqxCY&ab_channel=AbhinavKM)
