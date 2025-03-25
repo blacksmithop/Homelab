@@ -2,10 +2,10 @@
 
 ---
 
-## [Docker Setup](./homelab)
+## [Docker Setup](./)
 Setup for the services on my homelab  
 
-## [dotfiles](./config)
+## [dotfiles](./.config)
 My zsh config, aliases etc
 
 ---
