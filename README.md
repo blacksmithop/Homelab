@@ -2,7 +2,7 @@
 
 ---
 
-## [Docker Setup](./)
+## [Docker Setup](./docker-compose.yml)
 Setup for the services on my homelab  
 
 ## [dotfiles](./.config)
