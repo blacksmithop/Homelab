@@ -9,7 +9,6 @@ services:
       - CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
     networks:
       - cf
-      - warp
   
   # Nginx Proxy Manager (NPM)
   npm:
@@ -29,10 +28,9 @@ services:
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
-    ports:
-      - 9443:9443
-    networks:
-      - warp
+    # ports:
+    #   - 9443:9443
+    network_mode: "host"
     volumes:
       - portainer-data:/data
       - /var/run/docker.sock:/var/run/docker.sock
@@ -71,29 +69,6 @@ services:
       OIDC_SCOPES: ""
     networks:
       - services
-
-  # ShellHub Agent
-  shellhub:
-    image: shellhubio/agent:v0.18.2
-    container_name: shellhub
-    restart: on-failure
-    privileged: true
-    network_mode: host
-    pid: host
-    volumes:
-      - /:/host
-      - /dev:/dev
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/passwd:/etc/passwd
-      - /etc/group:/etc/group
-      - /etc/resolv.conf:/etc/resolv.conf
-      - /var/run:/var/run
-      - /var/log:/var/log
-      - /tmp:/tmp
-    environment:
-      - SHELLHUB_SERVER_ADDRESS=${SHELLHUB_SERVER_ADDRESS}
-      - SHELLHUB_TENANT_ID=${SHELLHUB_TENANT_ID}
-      - SHELLHUB_PRIVATE_KEY=${SHELLHUB_PRIVATE_KEY:-/host/etc/shellhub.key}
 
   # Plex
   plex:
@@ -135,7 +110,5 @@ volumes:
 networks:
   cf:
     name: cf
-  warp:
-    name: warp
   services:
     name: services
