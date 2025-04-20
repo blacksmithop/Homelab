@@ -24,18 +24,6 @@ services:
     environment:
       DB_SQLITE_FILE: "/data/database.sqlite"
 
-  # Portainer
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    # ports:
-    #   - 9443:9443
-    network_mode: "host"
-    volumes:
-      - portainer-data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
-
   # Homepage
   homepage:
     image: blacksmithop/homepage
@@ -43,6 +31,21 @@ services:
     restart: unless-stopped
     networks:
       - services
+
+  mc:
+    image: itzg/minecraft-server
+    container_name: minecraft
+    tty: true
+    networks:
+      - services
+    stdin_open: true
+    ports:
+      - "25565:25565"
+    environment:
+      EULA: "TRUE"
+    volumes:
+      # attach the relative directory 'data' to the container's /data path
+      - ./data/minecraft:/data
 
   pastebin:
     image: "ghcr.io/jordan-dalby/bytestash:latest"
@@ -104,7 +107,6 @@ services:
       - services
 
 volumes:
-  portainer-data:
   plex-library:
 
 networks:
