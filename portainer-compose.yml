@@ -1,0 +1,15 @@
+services:
+  # Portainer
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    # ports:
+    #   - 9443:9443
+    network_mode: "host"
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+volumes:
+  portainer-data:
