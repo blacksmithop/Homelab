@@ -16,7 +16,9 @@ Cloudflared Tunnel + Nginx Proxy Manager Setup
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Udc6HeOqxCY/0.jpg)](https://www.youtube.com/watch?v=Udc6HeOqxCY&ab_channel=AbhinavKM)
 
-TODO:
-Wiki
-Dotfile auto integration
-Automated environment setup bash script
+## TODO:
+
+* Wiki
+* Dotfile auto integration
+* Automated environment setup bash script
+* Common folder of all docker compose files, auto pull and re-deploy (cron-job?)
