@@ -4,6 +4,6 @@
 [submodule "builds/featbit"]
 	path = builds/featbit
 	url = https://github.com/featbit/featbit
-[submodule "builds/harbor"]
-	path = builds/harbor
-	url = https://github.com/goharbor/harbor
+# [submodule "builds/harbor"]
+# 	path = builds/harbor
+# 	url = https://github.com/goharbor/harbor
