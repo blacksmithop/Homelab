@@ -42,8 +42,6 @@ services:
     environment:
       GITHUB_TOKEN: ${GITHUB_TOKEN}
 
-
-
   pastebin:
     image: "ghcr.io/jordan-dalby/bytestash:latest"
     container_name: pastebin
