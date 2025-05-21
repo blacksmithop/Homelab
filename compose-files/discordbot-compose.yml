@@ -1,10 +1,9 @@
 services:
-  discord-bot:
+  discord_bot:
     container_name: bot
     image: blacksmithop/bot
     networks:
       - services
-    ports: []
     environment:
       - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
       - LLM_PROVIDER=${LLM_PROVIDER}
@@ -24,6 +23,18 @@ services:
       - AZURE_EMBEDDINGS_MODEL=${AZURE_EMBEDDINGS_MODEL}
       - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
 
+  botdashboard:
+    image: blacksmithop/bot-dashboard
+    container_name: botdashboard
+    restart: unless-stopped
+    networks:
+      - services
+    environment:  
+      DISCORD_APP_CLIENT_ID: ${DISCORD_APP_CLIENT_ID}
+      DISCORD_APP_SECRET: ${DISCORD_APP_SECRET}
+      REDIRECT_URI: ${REDIRECT_URI}
+
 networks:
   services:
     name: services
+    external: true
