@@ -23,7 +23,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  minio:
+  milvus_minio:
     container_name: milvus-minio
     image: minio/minio:RELEASE.2023-03-20T20-16-18Z
     environment:
@@ -72,7 +72,7 @@ services:
     #   - "9091:9091"
     depends_on:
       - "etcd"
-      - "minio"
+      - "milvus_minio"
     networks:
       - services
     logging:
