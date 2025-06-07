@@ -1,0 +1,19 @@
+services:
+  memos:
+    image: neosmemo/memos:stable
+    container_name: memos
+    init: true
+    ports:
+      - "5230:5230"
+    volumes:
+      - memos-data:/var/opt/memos
+    networks:
+      - services
+
+volumes:
+  memos-data:
+    name: memos-data
+
+networks:
+  services:
+    external: true
