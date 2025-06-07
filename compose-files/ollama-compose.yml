@@ -1,0 +1,20 @@
+services:
+  # Ollama
+  ollama:
+    image: ollama/ollama:latest
+    # ports:
+    #   - 11434:11434
+    volumes:
+      - ../data/ollama:/root/.ollama
+    container_name: ollama
+    tty: true
+    restart: unless-stopped
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=${OLLAMA_HOST}
+    networks:
+      - services
+
+networks:
+  services:
+    external: true

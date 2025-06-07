@@ -1,0 +1,24 @@
+services:
+  # Plex
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - VERSION=docker
+    volumes:
+      - plex-library:/config
+      - ../data/media/series:/tv
+      - ../data/media/movies:/movies
+    restart: unless-stopped
+    networks:
+      - services
+
+volumes:
+  plex-library:
+  
+networks:
+  services:
+    external: true
