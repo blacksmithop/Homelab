@@ -32,15 +32,6 @@ services:
       - 8.8.8.8
       - 1.1.1.1
 
-  # Homepage
-  api:
-    image: blacksmithop/api
-    container_name: api
-    restart: unless-stopped
-    networks:
-      - services
-    environment:
-      GITHUB_TOKEN: ${GITHUB_TOKEN}
     
   pastebin:
     image: "ghcr.io/jordan-dalby/bytestash:latest"
@@ -68,41 +59,6 @@ services:
     networks:
       - services
 
-  # Plex
-  plex:
-    image: lscr.io/linuxserver/plex:latest
-    container_name: plex
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - VERSION=docker
-    volumes:
-      - plex-library:/config
-      - ./data/media/series:/tv
-      - ./data/media/movies:/movies
-    restart: unless-stopped
-    networks:
-      - services
-
-  # Ollama
-  ollama:
-    image: ollama/ollama:latest
-    # ports:
-    #   - 11434:11434
-    volumes:
-      - ./data/ollama:/root/.ollama
-    container_name: ollama
-    tty: true
-    restart: unless-stopped
-    environment:
-      - OLLAMA_KEEP_ALIVE=24h
-      - OLLAMA_HOST=${OLLAMA_HOST}
-    networks:
-      - services
-
-volumes:
-  plex-library:
 
 networks:
   cf:
