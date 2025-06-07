@@ -1,0 +1,12 @@
+services:
+  gatus:
+    image: twinproduction/gatus:stable
+    container_name: gatus
+    restart: always
+    volumes:
+      - './gato_config.yaml:/config/config.yaml:ro'
+    networks:
+      - services
+networks:
+  services:
+    external: true
