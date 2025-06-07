@@ -1,0 +1,14 @@
+services:
+  # Homepage
+  api:
+    image: blacksmithop/api
+    container_name: api
+    restart: unless-stopped
+    networks:
+      - services
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+
+networks:
+  services:
+    external: true
