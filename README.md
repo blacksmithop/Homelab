@@ -22,6 +22,7 @@ Cloudflared Tunnel + Nginx Proxy Manager Setup
 * Dotfile auto integration
 * Automated environment setup bash script
 * Common folder of all docker compose files, auto pull and re-deploy (cron-job?)
+* Interactive CLI app to automate setup
 
 Rust:
 https://github.com/samrocketman/docker-compose-lgsm-rust-dedicated-server/blob/main/docker-compose.yml
