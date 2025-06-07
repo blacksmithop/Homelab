@@ -1,0 +1,23 @@
+services:
+  kavita:
+    image: jvmilazz0/kavita:latest    # Using the stable branch from the official dockerhub repo.
+    container_name: kavita
+    volumes:
+      - 'kavita_manga:/manga'
+      - 'kavita_comics:/comics'
+      - 'kavita_books:/books'
+      - '/your/path/to/saved/config:/kavita/config'     # /kavita/config must not be changed
+    environment:
+      - TZ=Your/Timezone
+    # ports:
+    #   - "5000:5000"
+    restart: unless-stopped
+    networks:
+      - services
+volumes:
+  kavita_manga:
+  kavita_comics:
+  kavita_books:
+networks:
+  services:
+    external: true
