@@ -2,27 +2,25 @@
 
 ---
 
-## [Docker Setup](./docker-compose.yml)
-Setup for the services on my homelab  
+My setup for running services on my homelab.
 
-## [dotfiles](./.config)
-My zsh config, aliases etc
+* Most if not all services run as Docker containers
+* I use Tailscale for SSH and RDP access
+* Cloudflare Tunnels + NPM is used to expose services under subdomains
+* All development is done locally and deployed using docker images
 
----
+You can find the different docker compose files [here](./compose-files/)
 
-## Video Guide
+### Video Guide
 
-Cloudflared Tunnel + Nginx Proxy Manager Setup
+Run a homelab server using Cloudflared Tunnel and Nginx Proxy Manager
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Udc6HeOqxCY/0.jpg)](https://www.youtube.com/watch?v=Udc6HeOqxCY&ab_channel=AbhinavKM)
+[![Self-hosted guide](https://img.youtube.com/vi/Udc6HeOqxCY/0.jpg)](https://www.youtube.com/watch?v=Udc6HeOqxCY&ab_channel=AbhinavKM)
 
 ## TODO:
 
-* Wiki
-* Dotfile auto integration
-* Automated environment setup bash script
-* Common folder of all docker compose files, auto pull and re-deploy (cron-job?)
-* Interactive CLI app to automate setup
-
-Rust:
-https://github.com/samrocketman/docker-compose-lgsm-rust-dedicated-server/blob/main/docker-compose.yml
+* Dedicated wiki page
+* Integrate dotfiles and zshrc
+* CI/CD
+* Bash script to automate setup
+* Rust server https://github.com/samrocketman/docker-compose-lgsm-rust-dedicated-server/blob/main/docker-compose.yml
