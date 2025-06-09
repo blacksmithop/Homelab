@@ -1138,3 +1138,28 @@ cat <<EOS
     ${tty_underline}https://docs.brew.sh${tty_reset}
 
 EOS
+
+# Add Brew to PATH dynamically
+BREW_SHELLENV='eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
+BREW_COMMENT='# Add Homebrew to PATH'
+
+if [ -f "$HOME/.zshrc" ]; then
+    # Update .zshrc if it exists
+    if ! grep -Fx "$BREW_SHELLENV" "$HOME/.zshrc" > /dev/null; then
+        echo "$BREW_COMMENT" >> "$HOME/.zshrc"
+        echo "$BREW_SHELLENV" >> "$HOME/.zshrc"
+    fi
+    # Source .zshrc
+    source "$HOME/.zshrc"
+else
+    # Update .bashrc if .zshrc does not exist
+    if ! grep -Fx "$BREW_SHELLENV" "$HOME/.bashrc" > /dev/null; then
+        echo "$BREW_COMMENT" >> "$HOME/.bashrc"
+        echo "$BREW_SHELLENV" >> "$HOME/.bashrc"
+    fi
+    # Source .bashrc
+    source "$HOME/.bashrc"
+fi
+
+# Apply to current session
+eval "$BREW_SHELLENV"
