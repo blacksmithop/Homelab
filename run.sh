@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Step 1: Introduction
 gum style \
