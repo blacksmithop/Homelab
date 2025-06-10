@@ -141,7 +141,7 @@ fi
 
 # Step 10: Install Tailscale if not present
 if gum confirm "Install Tailscale?"; then
-    zsh ./scripts/tailscale_install.sh || {
+    curl -fsSL https://tailscale.com/install.sh | sh || {
         echo "Failed to install Tailscale."
         exit 1
     }
