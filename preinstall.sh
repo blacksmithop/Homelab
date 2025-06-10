@@ -1,77 +1,100 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 
-# Step 1: Install zsh if not present
-if ! command -v zsh &> /dev/null; then
-    echo "Installing zsh..."
-    sudo apt-get update && sudo apt-get install -y zsh || {
-        echo "Failed to install zsh."
-        exit 1
-    }
-    # Set zsh as default shell
-    chsh -s $(which zsh)
-    echo "zsh installed successfully."
-else
-    echo "zsh is already installed."
+# Prevent recursive execution
+if [[ -n "${_INSTALL_SETUP_SCRIPT_RUNNING}" ]]; then
+    echo "Script is already running. Exiting to prevent loops."
+    exit 0
 fi
+export _INSTALL_SETUP_SCRIPT_RUNNING=1
 
-# Step 2: Install Oh My Zsh if not present
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    echo "Installing Oh My Zsh..."
-    # Run Oh My Zsh installer explicitly with zsh
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended || {
-        echo "Failed to install Oh My Zsh."
-        exit 1
-    }
-    echo "Oh My Zsh installed successfully."
-else
-    echo "Oh My Zsh is already installed."
-fi
+# --- Helper Functions ---
+log_success() { echo -e "\033[32m✓ $*\033[0m"; }
+log_info() { echo -e "\033[34mℹ $*\033[0m"; }
+log_error() { echo -e "\033[31m✗ Error: $*\033[0m"; exit 1; }
 
-# Step 3: Install Homebrew if not present
-if ! command -v brew &> /dev/null; then
-    echo "Installing Homebrew..."
-    zsh ./scripts/brew_install.sh || {
-        echo "Failed to install Homebrew."
-        exit 1
-    }
-    echo "Homebrew installed successfully."
-else
-    echo "Homebrew is already installed."
-fi
-
-# Step 4: Add Homebrew to PATH
-BREW_SHELLENV='eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
-BREW_COMMENT='# Add Homebrew to PATH'
-
-if [ -f "$HOME/.zshrc" ]; then
-    # Update .zshrc if it exists
-    if ! grep -Fx "$BREW_SHELLENV" "$HOME/.zshrc" > /dev/null; then
-        echo "$BREW_COMMENT" >> "$HOME/.zshrc"
-        echo "$BREW_SHELLENV" >> "$HOME/.zshrc"
-        echo "Added Homebrew to .zshrc"
+# --- Installation Functions ---
+install_zsh() {
+    if command -v zsh &>/dev/null; then
+        log_info "zsh already installed"
+        return
     fi
-else
-    # Create .zshrc if it doesn't exist
-    touch "$HOME/.zshrc"
-    echo "$BREW_COMMENT" >> "$HOME/.zshrc"
-    echo "$BREW_SHELLENV" >> "$HOME/.zshrc"
-    echo "Created and updated .zshrc with Homebrew PATH"
-fi
 
-# Source .zshrc only if running in zsh
-if [ -n "$ZSH_VERSION" ]; then
-    source "$HOME/.zshrc"
-    echo "Sourced .zshrc"
-else
-    echo "Not sourcing .zshrc as current shell is not zsh."
-fi
+    log_info "Installing zsh..."
+    sudo apt-get update && sudo apt-get install -y zsh || log_error "zsh installation failed"
+    
+    # Set as default shell only if not already set
+    if [[ "$SHELL" != "$(command -v zsh)" ]]; then
+        sudo chsh -s "$(command -v zsh)" "$USER" || log_error "Changing default shell failed"
+    fi
+    log_success "zsh installed and set as default shell"
+}
 
-# Apply Homebrew to current session
-eval "$BREW_SHELLENV"
+install_ohmyzsh() {
+    if [[ -d "${HOME}/.oh-my-zsh" ]]; then
+        log_info "Oh My Zsh already installed"
+        return
+    fi
 
-echo "Installing glum"
+    log_info "Installing Oh My Zsh..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended || \
+        log_error "Oh My Zsh installation failed"
+    log_success "Oh My Zsh installed"
+}
 
-brew install gum
+install_homebrew() {
+    if command -v brew &>/dev/null; then
+        log_info "Homebrew already installed"
+        return
+    fi
 
+    log_info "Installing Homebrew..."
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || \
+        log_error "Homebrew installation failed"
+    log_success "Homebrew installed"
+}
 
-echo "Pre-installation setup completed!"
+configure_brew_path() {
+    local brew_path="/home/linuxbrew/.linuxbrew/bin/brew"
+    local zshrc="${HOME}/.zshrc"
+    local marker="# Homebrew PATH configuration"
+    local config_lines=(
+        "$marker"
+        'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
+    )
+
+    # Check if configuration exists
+    if grep -qF "$marker" "$zshrc"; then
+        log_info "Homebrew PATH already configured"
+        return
+    fi
+
+    log_info "Adding Homebrew to PATH in .zshrc"
+    printf "\n%s\n" "${config_lines[@]}" >> "$zshrc"
+    eval "$("$brew_path" shellenv)"  # Apply to current session
+    log_success "Homebrew PATH configured"
+}
+
+install_gum() {
+    if command -v gum &>/dev/null; then
+        log_info "gum already installed"
+        return
+    fi
+
+    log_info "Installing gum..."
+    brew install gum || log_error "gum installation failed"
+    log_success "gum installed"
+}
+
+# --- Main Execution ---
+main() {
+    install_zsh
+    install_ohmyzsh
+    install_homebrew
+    configure_brew_path
+    install_gum
+    
+    log_success "Pre-installation setup completed!"
+    unset _INSTALL_SETUP_SCRIPT_RUNNING
+}
+
+main
