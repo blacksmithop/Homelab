@@ -11,7 +11,25 @@ My setup for running services on my homelab.
 
 You can find the different docker compose files [here](./compose-files/)
 
-### Video Guide
+## Environment Setup
+
+To setup the environment run the following commands
+
+```bash
+bash preinstall.sh
+```
+
+![Pre-install script](./data/assets/preinstall.svg)
+
+Followed by
+
+```
+zsh run.sh
+```
+
+![Run script](./data/assets/run.svg)
+
+## Video Guide
 
 Run a homelab server using Cloudflared Tunnel and Nginx Proxy Manager
 
