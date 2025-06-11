@@ -1,5 +1,7 @@
 # Homelab
 
+![Stack](https://skillicons.dev/icons?i=ubuntu,bash,py,cloudflare,nginx,vscode)
+
 ---
 
 My setup for running services on my homelab.
