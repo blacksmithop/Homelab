@@ -65,8 +65,8 @@ services:
     container_name: langfuse-web
     restart: always
     depends_on: *langfuse-depends-on
-    ports:
-      - 3000:3000
+    # ports:
+    #   - 3000:3000
     environment:
       <<: *langfuse-worker-env
       NEXTAUTH_URL: http://langfuse-web:3000

@@ -1,0 +1,12 @@
+services:
+  # Homepage
+  servicemonitor:
+    image: blacksmithop/services
+    container_name: servicemonitor
+    restart: unless-stopped
+    networks:
+      - services
+
+networks:
+  services:
+    external: true

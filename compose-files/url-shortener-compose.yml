@@ -1,0 +1,23 @@
+services:
+  snapp:
+    image: uraniadev/snapp:latest
+    container_name: snapp
+    # ports:
+    #   - 3000:3000
+    environment:
+      ORIGIN: url.abhinavkm.com
+      PUBLIC_URL: https://url.abhinavkm.com
+      DATABASE_PROVIDER: sqlite
+      DATABASE_URL: file:/data/db.sqlite
+      TOKEN_SECRET: ${SNAPP_TOKEN_SECRET:-}
+      ADMIN_PASSWORD: ${SNAPP_ADMIN_PASSWORD:-}
+
+    volumes:
+      - snapp-data:/data
+    networks:
+      - services
+networks:
+  services:
+    external: true
+volumes:
+  snapp-data:

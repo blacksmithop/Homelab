@@ -1,0 +1,26 @@
+services:
+  chrome:
+    image: ich777/chrome
+    container_name: chrome
+    ports:
+      - 8080:8080
+    environment:
+      - CUSTOM_RES_W=1280
+      - CUSTOM_RES_H=768
+      - UID=99
+      - GID=100
+      - UMASK=000
+      - DATA_PERM=770
+    volumes:
+      - chrome-data:/chrome
+    networks:
+      - services
+    restart: unless-stopped
+
+volumes:
+  chrome-data:
+    name: chrome-data
+
+networks:
+  services:
+    external: true
