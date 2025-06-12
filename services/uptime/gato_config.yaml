@@ -1,7 +1,7 @@
 alerting:
   github:
     repository-url: "https://github.com/blacksmithop/Homelab"
-    token: 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
+    token: INPUT_TOKEN
 
 endpoints:
   - name: api
