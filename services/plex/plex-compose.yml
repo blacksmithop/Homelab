@@ -10,15 +10,17 @@ services:
       - VERSION=docker
     volumes:
       - plex-library:/config
-      - ../data/media/series:/tv
-      - ../data/media/movies:/movies
+      - series:/tv
+      - movies:/movies
     restart: unless-stopped
     networks:
       - services
 
 volumes:
   plex-library:
-  
+  series:
+  movies:
+
 networks:
   services:
     external: true

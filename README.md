@@ -4,14 +4,13 @@
 
 ---
 
-My setup for running services on my homelab.
+## FAQ
 
-* Most if not all services run as Docker containers
-* I use Tailscale for SSH and RDP access
-* Cloudflare Tunnels + NPM is used to expose services under subdomains
-* All development is done locally and deployed using docker images
+### How do I run my services
 
-You can find the different docker compose files [here](./compose-files/)
+* Services are using `docker-compose`
+* Tailscale is used for SSH & RDP connectivity
+* Cloudflare Tunnels + NPM is used to expose services as subdomains
 
 ## Environment Setup
 

@@ -1,0 +1,47 @@
+alerting:
+  github:
+    repository-url: "https://github.com/blacksmithop/Homelab"
+    token: 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
+
+endpoints:
+  - name: api
+    url: "https://api.abhinavkm.com/docs"
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: npm
+    url: "https://npm.abhinavkm.com"
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: pastebin
+    url: "https://pastebin.abhinavkm.com"
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: bot
+    url: "https://bot.abhinavkm.com"
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: epub
+    url: "https://epub.abhinavkm.com"
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: gitlab
+    url: "https://gitlab.abhinavkm.com"
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: notes
+    url: "https://notes.abhinavkm.com"
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"

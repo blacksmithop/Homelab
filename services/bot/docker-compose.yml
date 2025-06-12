@@ -30,6 +30,13 @@ services:
       - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
       - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
       - LANGFUSE_HOST=${LANGFUSE_HOST}
+    # depends_on:
+        # langfuse-web:
+        #   condition: service_healthy
+        # ollama:
+        #   condition: service_healthy
+        # milvus-standalone:
+        #   condition: service_healthy
 
   botdashboard:
     image: blacksmithop/bot-dashboard
@@ -38,9 +45,9 @@ services:
     networks:
       - services
     environment:  
-      DISCORD_APP_CLIENT_ID: ${DISCORD_APP_CLIENT_ID}
-      DISCORD_APP_SECRET: ${DISCORD_APP_SECRET}
-      REDIRECT_URI: ${REDIRECT_URI}
+      - DISCORD_APP_CLIENT_ID=${DISCORD_APP_CLIENT_ID}
+      - DISCORD_APP_SECRET=${DISCORD_APP_SECRET}
+      - REDIRECT_URI=${REDIRECT_URI}
 
 networks:
   services:
