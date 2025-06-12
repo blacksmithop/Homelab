@@ -4,7 +4,7 @@ services:
     container_name: pastebin
     restart: always
     volumes:
-      - ../data/snippets:/data/snippets
+      - snippets:/data/snippets
     environment:
       # See https://github.com/jordan-dalby/ByteStash/wiki/FAQ#environment-variables
       BASE_PATH: ""
@@ -14,7 +14,6 @@ services:
       DEBUG: "true"
       DISABLE_ACCOUNTS: "false"
       DISABLE_INTERNAL_ACCOUNTS: "false"
-
       # See https://github.com/jordan-dalby/ByteStash/wiki/Single-Sign%E2%80%90on-Setup for more info
       OIDC_ENABLED: "false"
       OIDC_DISPLAY_NAME: ""
@@ -24,6 +23,9 @@ services:
       OIDC_SCOPES: ""
     networks:
       - services
+
+volumes:
+  snippets:
 
 networks:
   services:
