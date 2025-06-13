@@ -2,7 +2,7 @@ services:
   gitlab:
     image: gitlab/gitlab-ce:17.10.7-ce.0
     container_name: gitlab
-    restart: always
+    restart: unless-stopped
     hostname: 'gitlab.example.com'
     environment:
       GITLAB_OMNIBUS_CONFIG: |

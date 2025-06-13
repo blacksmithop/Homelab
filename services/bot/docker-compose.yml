@@ -2,6 +2,7 @@ services:
   discord_bot:
     container_name: bot
     image: blacksmithop/bot
+    restart: unless-stopped
     networks:
       - services
     environment:
@@ -30,13 +31,6 @@ services:
       - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
       - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
       - LANGFUSE_HOST=${LANGFUSE_HOST}
-    # depends_on:
-        # langfuse-web:
-        #   condition: service_healthy
-        # ollama:
-        #   condition: service_healthy
-        # milvus-standalone:
-        #   condition: service_healthy
 
   botdashboard:
     image: blacksmithop/bot-dashboard

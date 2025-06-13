@@ -4,9 +4,10 @@ services:
   neko-firefox:
     image: ghcr.io/m1k1o/neko/firefox:latest
     container_name: neko-firefox
-    ports:
-      - "8080:8080"
-      - "56000-56100:56000-56100/udp"
+    restart: unless-stopped
+    # ports:
+    #   - "8080:8080"
+    #   - "56000-56100:56000-56100/udp"
     environment:
       - NEKO_WEBRTC_EPR=56000-56100
       - NEKO_WEBRTC_NAT1TO1=127.0.0.1
