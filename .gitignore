@@ -1,2 +1,3 @@
 .env
 compose-files/gato_config.yaml
+services/homepage/config
