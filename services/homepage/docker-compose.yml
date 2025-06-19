@@ -6,7 +6,14 @@ services:
     # ports:
     #   - 3000:3000
     volumes:
-      - /path/to/config:/app/config # Make sure your local config directory exists
-      - /var/run/docker.sock:/var/run/docker.sock # (optional) For docker integrations
+      - ./config:/app/config
+      - ./images:/app/public/images
+      - /var/run/docker.sock:/var/run/docker.sock # For docker integrations
     environment:
-      HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
+      HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev, homelab.abhinavkm.com
+    networks:
+      - services
+
+networks:
+  services:
+    external: true
