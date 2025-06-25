@@ -10,7 +10,7 @@ services:
       - ./images:/app/public/images
       - /var/run/docker.sock:/var/run/docker.sock # For docker integrations
     environment:
-      HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev, homelab.abhinavkm.com
+      HOMEPAGE_ALLOWED_HOSTS: homelab.abhinavkm.com
     networks:
       - services
 
