@@ -6,11 +6,17 @@
 
 ## FAQ
 
-### How do I run my services
+### How do I run my services?
 
-* Services are using `docker-compose`
-* Tailscale is used for SSH & RDP connectivity
-* Cloudflare Tunnels + NPM is used to expose services as subdomains
+I run them as Docker containers using `docker-compose`
+
+### How do I connect to my homelab?
+
+I use Tailscale is used for SSH & RDP connectivity
+
+### How do I expose my services to the internet?
+
+Cloudflare Tunnels behind an nginx reverse-proxy is used to expose services through subdomains
 
 ## Environment Setup
 
@@ -27,8 +33,17 @@ Followed by
 ```
 zsh run.sh
 ```
-
 ![Run script](./data/assets/run.svg)
+
+
+## Update Services
+
+```bash
+bash update.sh
+```
+
+![Update script](./data/assets/update.svg)
+
 
 ## Video Guide
 
