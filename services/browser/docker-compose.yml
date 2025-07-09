@@ -4,7 +4,6 @@ services:
   neko-firefox:
     image: ghcr.io/m1k1o/neko/firefox:latest
     container_name: neko-firefox
-    restart: unless-stopped
     # ports:
     #   - "8080:8080"
     #   - "56000-56100:56000-56100/udp"

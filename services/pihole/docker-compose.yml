@@ -3,7 +3,6 @@ services:
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
-    restart: unless-stopped
     ports:
       # DNS Ports
       - "53:53/tcp"

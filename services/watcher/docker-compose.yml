@@ -1,0 +1,11 @@
+services:
+  whatsupdocker:
+    image: getwud/wud
+    container_name: wud
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - services
+networks:
+  services:
+    external: true
