@@ -18,6 +18,12 @@ I use Tailscale for SSH & RDP connectivity
 
 Cloudflare Tunnels behind an nginx reverse-proxy is used to expose services through subdomains
 
+---
+
+Expose your homelab server using Cloudflared Tunnels and Nginx
+
+[![Cloudflare Tunnel and NPM Guide](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=Udc6HeOqxCY&ab_channel=AbhinavKM) [![Medium Article](https://img.shields.io/badge/Medium-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@angstycoder101/forget-the-cloud-run-your-own-server-with-cloudflare-tunnels-cb73cb5f18ab)
+
 ## Environment Setup
 
 To setup the environment run the following commands
@@ -44,12 +50,6 @@ bash update.sh
 
 ![Update script](./data/assets/update.svg)
 
-
-## Video Guide
-
-Run a homelab server using Cloudflared Tunnel and Nginx Proxy Manager
-
-[![Self-hosted guide](https://img.youtube.com/vi/Udc6HeOqxCY/0.jpg)](https://www.youtube.com/watch?v=Udc6HeOqxCY&ab_channel=AbhinavKM)
 
 ## TODO:
 
