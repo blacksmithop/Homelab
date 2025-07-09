@@ -12,7 +12,7 @@ I run them as Docker containers using `docker-compose`
 
 ### How do I connect to my homelab?
 
-I use Tailscale is used for SSH & RDP connectivity
+I use Tailscale for SSH & RDP connectivity
 
 ### How do I expose my services to the internet?
 
