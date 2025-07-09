@@ -1,3 +1,8 @@
 .env
 compose-files/gato_config.yaml
 services/homepage/config
+
+package.json
+package-lock.json
+
+.python-version
