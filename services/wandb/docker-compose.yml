@@ -1,0 +1,19 @@
+services:
+  wandb:
+    image: wandb/local
+    container_name: wandb
+    ports:
+      - "8080:8080"
+    volumes:
+      - wandb:/vol
+    deploy:
+      mode: replicated
+      replicas: 1
+    restart: unless-stopped
+
+networks:
+  services:
+    external: true
+
+volumes:
+  wandb:
