@@ -1,30 +1,34 @@
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$XDG_CONFIG_HOME/local/share"
-export XDG_CACHE_HOME="$XDG_CONFIG_HOME/cache"
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
 
-export EDITOR="nano"
-export VISUAL="nano"
+# Path to your Oh My Zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
 
-export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
-export HISTFILE="$ZDOTDIR/.zhistory"    # History filepath
-export HISTSIZE=10000                   # Maximum events for internal history
-export SAVEHIST=10000                   # Maximum events in history file
 
-source /home/abhinav/Experiments/.config/aliases
+plugins=(git python)
 
-autoload -U compinit; compinit
-_comp_options+=(globdots) # With hidden files
-source /home/abhinav/Experiments/.config/completion.zsh
+source $ZSH/oh-my-zsh.sh
 
-fpath=(/home/abhinav/Experiments/.config/ $fpath)
-autoload -Uz prompt; prompt
+# User configuration
 
-setopt AUTO_PUSHD           # Push the current directory visited on the stack.
-setopt PUSHD_IGNORE_DUPS    # Do not store duplicates in the stack.
-setopt PUSHD_SILENT         # Do not print the directory stack after pushd or popd.
+# Pyenv initialization (optimized and silenced)
+eval "$(pyenv init - zsh --no-rehash)" > /dev/null 2>&1
 
-alias d='dirs -v'
-for index ({1..9}) alias "$index"="cd +${index}"; unset index
+source ~/powerlevel10k/powerlevel10k.zsh-theme
 
-source "/home/abhinav/Experiments/.config/cursor_mode"
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+alias redock="docker compose pull && docker compose down && docker compose up -d"
+# Homebrew PATH configuration
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - zsh)"
