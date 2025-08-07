@@ -1,0 +1,19 @@
+services:
+  copyparty:
+    container_name: copyparty
+    image: copyparty/ac
+    user: "1000"
+    ports:
+      - "3939:3939"
+    volumes:
+      - ../../data/copyparty/data:/w:z
+      - ../../data/copyparty/config:/cfg:z
+    stdin_open: true
+    networks:
+      - services
+    tty: true
+    restart: unless-stopped
+
+networks:
+  services:
+    external: true
