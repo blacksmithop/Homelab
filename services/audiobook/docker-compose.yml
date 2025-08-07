@@ -1,0 +1,29 @@
+services:
+  audiobook:
+    container_name: audiobook
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    ports:
+      - 13378:80
+    volumes:
+      - audiobook_books:/audiobooks
+      - audiobook_podcasts:/podcasts
+      - audiobook_config:/config
+      - audiobook_metadata:/metadata
+    environment:
+      - TZ=Asia/Kolkata
+    networks:
+      - services
+
+volumes:
+  audiobook_books:
+    name: audiobook_books
+  audiobook_podcasts:
+    name: audiobook_podcasts
+  audiobook_config:
+    name: audiobook_config
+  audiobook_metadata:
+    name: audiobook_metadata
+
+networks:
+  services:
+    external: true
