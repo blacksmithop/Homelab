@@ -1,19 +1,21 @@
 services:
   wandb:
-    image: wandb/local
+    image: wandb/local:0.64.1
     container_name: wandb
     ports:
       - "8080:8080"
     volumes:
       - wandb:/vol
+    # networks:
+    #   - ml-services
     deploy:
       mode: replicated
       replicas: 1
     restart: unless-stopped
 
-networks:
-  services:
-    external: true
+# networks:
+#   ml-services:
 
 volumes:
   wandb:
+    name: wandb
