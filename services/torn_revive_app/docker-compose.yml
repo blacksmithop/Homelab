@@ -1,0 +1,10 @@
+services:
+  tornreviveapp:
+    image: ghcr.io/blacksmithop/tra/tornreviveapp:main
+    container_name: tornreviveapp
+    restart: unless-stopped
+    networks:
+      - services
+networks:
+  services:
+    external: true
