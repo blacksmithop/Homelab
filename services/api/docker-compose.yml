@@ -1,6 +1,6 @@
 services:
   api:
-    image: blacksmithop/api
+    image: ghcr.io/blacksmithop/blacksmithop/backend:main
     container_name: api
     restart: unless-stopped
     networks:
