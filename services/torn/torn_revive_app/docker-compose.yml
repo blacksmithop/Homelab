@@ -1,0 +1,22 @@
+services:
+  tornreviveapp:
+    image: ghcr.io/blacksmithop/tra/tornreviveapp:main
+    container_name: tornreviveapp
+    restart: unless-stopped
+    networks:
+      - services
+  tornredis:
+    image: "redis:latest"
+    container_name: tornredis
+    restart: unless-stopped
+    volumes:
+      - tornredis_data:/data
+    networks:
+      - services
+
+volumes:
+  tornredis_data:
+
+networks:
+  services:
+    external: true

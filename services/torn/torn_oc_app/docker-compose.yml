@@ -1,10 +1,11 @@
 services:
-  tornreviveapp:
-    image: ghcr.io/blacksmithop/tra/tornreviveapp:main
-    container_name: tornreviveapp
+  tornocapp:
+    image: ghcr.io/blacksmithop/toa/torn-proxy:main
+    container_name: tornocapp
     restart: unless-stopped
     networks:
       - services
+
 networks:
   services:
     external: true
