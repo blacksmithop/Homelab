@@ -1,28 +1,34 @@
-
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Header, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 import pandas as pd
-from typing import Optional
-import os
 from dotenv import load_dotenv
-
+from typing import Optional, Dict, Any
 from utils.database import DatabaseManager
 from utils.graph import build_time_range, generate_plot_buffer, send_to_discord
 from utils.poller import TornPoller
+from utils.crime_pass_rate import CPRManager
 
 load_dotenv()
 
-# Global poller instance
+# Global instances
 poller = TornPoller()
-
-# Database manager
 db = DatabaseManager()
+cpr_manager = CPRManager()
+
+async def verify_api_key(x_api_key: str = Header(..., alias="X-API-Key")):
+    """Verify API key for CPR endpoints"""
+    if not await cpr_manager.validate_api_key(x_api_key):
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    return x_api_key
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage background tasks on startup and shutdown"""
-    # Startup: Start poller
+    # Startup: Initialize databases and start poller
+    db.init_db()
+    cpr_manager.init_db()
     poller.start()
     
     yield  # App runs here
@@ -33,10 +39,16 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Torn Faction Respect → Discord (UTC)",
     version="2.0",
-    description="Combined API server with background data polling",
+    description="Combined API server with background data polling and Crime Pass Rate tracking",
     lifespan=lifespan
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://oc.tornrevive.page", "http://localhost:3000"],
+    allow_methods=["OPTIONS", "HEAD", "GET", "POST"],
+    allow_headers=["*"],
+)
 
 def fetch_data(start_utc=None, end_utc=None):
     """Fetch data using DatabaseManager and convert to DataFrame"""
@@ -101,6 +113,113 @@ async def graph_respect(
     )
 
 
+# Crime Pass Rate Endpoints
+@app.post("/cpr/submit")
+async def submit_cpr_data(
+    checkpoint_pass_rates: Dict[str, Any],
+    api_key: str = Depends(verify_api_key)
+):
+    """Submit crime pass rate data"""
+    success = await cpr_manager.store_cpr_data(api_key, checkpoint_pass_rates)
+    
+    if success:
+        return {
+            "status": "success",
+            "message": "CPR data stored successfully"
+        }
+    else:
+        raise HTTPException(
+            status_code=500, 
+            detail="Failed to store CPR data"
+        )
+
+@app.get("/cpr/user")
+async def get_user_cpr_data(
+    scenario_name: Optional[str] = None,
+    api_key: str = Depends(verify_api_key)
+):
+    """Get CPR data for a specific user"""
+    try:
+        data = await cpr_manager.get_cpr_data(api_key, scenario_name)
+        return {
+            "status": "success",
+            "api_key": api_key,
+            "scenario_filter": scenario_name,
+            "data": data
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error retrieving CPR data: {str(e)}"
+        )
+
+
+@app.get("/cpr/faction/{faction_id}")
+async def get_faction_cpr_data(
+    faction_id: int,
+    api_key: str = Depends(verify_api_key)
+):
+    """Get aggregated CPR data for a faction"""
+    try:
+        # First verify the API key belongs to someone in this faction
+        verify_query = """
+            SELECT faction_id FROM cpr_users WHERE api_key = %s
+        """
+        result = cpr_manager.execute_query(verify_query, (api_key,), fetch=True)
+        
+        if not result or result[0][0] != faction_id:
+            raise HTTPException(
+                status_code=403, 
+                detail="Access denied: API key not associated with this faction"
+            )
+        
+        data = await cpr_manager.get_faction_cpr_data(faction_id)
+        return {
+            "status": "success",
+            "faction_id": faction_id,
+            "data": data
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error retrieving faction CPR data: {str(e)}"
+        )
+
+
+@app.get("/cpr/faction/{faction_id}/members")
+async def get_faction_cpr_members_format(
+    faction_id: int,
+    api_key: str = Depends(verify_api_key)
+):
+    """Get faction CPR data in member-based format"""
+    try:
+        # First verify the API key belongs to someone in this faction
+        verify_query = """
+            SELECT faction_id FROM cpr_users WHERE api_key = %s
+        """
+        result = cpr_manager.execute_query(verify_query, (api_key,), fetch=True)
+        
+        if not result or result[0][0] != faction_id:
+            raise HTTPException(
+                status_code=403, 
+                detail="Access denied: API key not associated with this faction"
+            )
+        
+        data = await cpr_manager.get_faction_cpr_members_format(faction_id)
+        return data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error retrieving faction CPR members data: {str(e)}"
+        )
+
+
+# Poller Endpoints
 @app.get("/poller/status")
 async def get_poller_status():
     """Get the status of the background poller"""
@@ -134,11 +253,14 @@ async def stop_poller():
 @app.get("/")
 def root():
     return {
-        "message": "Torn Faction Respect Monitor (UTC)",
+        "message": "Torn Faction Respect Monitor (UTC) with Crime Pass Rate Tracking",
         "endpoints": {
             "/": "This info",
             "/plot": "Send plot to Discord",
             "/graph": "Get plot as PNG image",
+            "/cpr/submit": "Submit crime pass rate data",
+            "/cpr/user": "Get user CPR data",
+            "/cpr/faction/{faction_id}": "Get faction CPR data",
             "/poller/status": "Check poller status",
             "/poller/trigger": "Manually trigger data fetch",
             "/poller/start": "Start background poller",
@@ -150,7 +272,8 @@ def root():
             "Background data polling (every 1 hour)",
             "Discord webhook integration",
             "Real-time graphing",
-            "PostgreSQL data storage"
+            "PostgreSQL data storage",
+            "Crime Pass Rate tracking"
         ]
     }
 

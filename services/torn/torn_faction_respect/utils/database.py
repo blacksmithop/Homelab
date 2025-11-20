@@ -5,7 +5,9 @@ Database manager for Torn Faction data
 import os
 import psycopg2
 from datetime import datetime, timezone, timedelta
-from typing import Optional
+from typing import Optional, List, Tuple, Any
+
+
 class DatabaseManager:
     def __init__(self):
         self.db_config = {
@@ -20,11 +22,44 @@ class DatabaseManager:
         """Get a new database connection"""
         return psycopg2.connect(**self.db_config)
 
+    def execute_query(self, query: str, params: Tuple[Any, ...] = None, fetch: bool = False) -> Optional[List[Tuple]]:
+        """
+        Execute a database query with optional parameters and fetch results
+        
+        Args:
+            query: SQL query string
+            params: Query parameters
+            fetch: Whether to fetch and return results
+            
+        Returns:
+            List of tuples if fetch=True, None otherwise
+        """
+        conn = self.get_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute(query, params)
+            
+            if fetch:
+                result = cur.fetchall()
+                conn.commit()
+                return result
+            else:
+                conn.commit()
+                return None
+                
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            cur.close()
+            conn.close()
+
     def init_db(self):
         """Initialize database tables"""
         conn = self.get_connection()
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS faction_log (
                 id SERIAL PRIMARY KEY,
                 ts TIMESTAMPTZ NOT NULL,
@@ -38,7 +73,8 @@ class DatabaseManager:
                 tag TEXT,
                 name TEXT
             )
-        """)
+        """
+        )
         conn.commit()
         cur.close()
         conn.close()
@@ -51,7 +87,7 @@ class DatabaseManager:
         row = cur.fetchone()
         cur.close()
         conn.close()
-        
+
         if not row:
             return None
         return datetime.now(timezone.utc) - row[0]
@@ -60,23 +96,26 @@ class DatabaseManager:
         """Insert faction data into the database"""
         conn = self.get_connection()
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             INSERT INTO faction_log (
                 ts, respect, members, capacity, best_chain, days_old,
                 rank_level, rank_name, tag, name
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (
-            data['ts'],
-            data.get("respect"),
-            data.get("members"),
-            data.get("capacity"),
-            data.get("best_chain"),
-            data.get("days_old"),
-            data.get("rank_level"),
-            data.get("rank_name"),
-            data.get("tag"),
-            data.get("name")
-        ))
+        """,
+            (
+                data["ts"],
+                data.get("respect"),
+                data.get("members"),
+                data.get("capacity"),
+                data.get("best_chain"),
+                data.get("days_old"),
+                data.get("rank_level"),
+                data.get("rank_name"),
+                data.get("tag"),
+                data.get("name"),
+            ),
+        )
         conn.commit()
         cur.close()
         conn.close()
